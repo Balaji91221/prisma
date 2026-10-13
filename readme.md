@@ -1,83 +1,65 @@
-# Prisma TypeScript Project with PostgreSQL
+# Prisma + PostgreSQL · TypeScript CRUD
 
-This project demonstrates how to use Prisma with PostgreSQL to create, update, and manage user data. The project includes TypeScript scripts for inserting and updating users in the database.
+**A compact example of moving from a database schema to typed application queries.**
 
-## Prerequisites
+Prisma · PostgreSQL · TypeScript
 
-Before you begin, ensure you have met the following requirements:
+## Purpose
 
-- You have installed Node.js and npm.
-- You have a PostgreSQL database set up.
-- You have created a `.env` file with your database connection URL.
+This learning project demonstrates how Prisma describes a database, generates a client, and performs user operations from TypeScript. It is useful for understanding the ORM boundary without a web framework around it.
 
-## Setting Up the Project
+## Included examples
 
-1. **Clone the Repository**
+- A PostgreSQL schema with `User` and `Todo` models.
+- A checked-in schema migration.
+- User creation with selected return fields.
+- User updates and deletion by unique username.
 
-   ```bash
-   git clone https://github.com/Balaji91221/prisma.git
-   cd  prisma
-   ```
+## Setup
 
-2. **Install the dependencies**
-    ```bash
-    npm install
-    ```
-3.**Set Up Prisma**
+Use Node.js/npm and a disposable PostgreSQL development database. From the source directory:
 
-- Generate the Prisma client:
+```bash
+npm install
+```
+
+Set `DATABASE_URL` in a local `.env` file, then generate the client and apply the included migration:
 
 ```bash
 npx prisma generate
+npx prisma migrate deploy
+npm run build
 ```
-4.**Run Migrations**
 
-- Apply the database migrations:
+Review the sample calls in [`src/index.ts`](src/index.ts) before running:
 
 ```bash
-npx prisma migrate dev --name UserAndTodoAdded
-
+npm start
 ```
 
-5.**Transpile TypeScript**
-- Compile the TypeScript files:
-```bash
-tsc -b
+The entry point immediately invokes create, update, and delete examples using sample usernames. Update/delete require those records to exist, and repeated inserts can violate the unique-username constraint. These operations are independent examples, not an ordered transaction or idempotent seed script.
+
+## Data flow
+
+```mermaid
+flowchart LR
+    S[Prisma schema] --> G[Generated Prisma client]
+    T[TypeScript CRUD examples] --> G
+    G --> DB[(PostgreSQL)]
+    M[Migration SQL] --> DB
 ```
 
-6.**Running the Project**
+## Source guide
 
-- To run the project, use the following command:
-```bash
-node dist/index.js
-```
+| Path | Responsibility |
+|---|---|
+| [`prisma/schema.prisma`](prisma/schema.prisma) | Models and datasource |
+| [`prisma/migrations/`](prisma/migrations/) | Schema migration history |
+| [`src/index.ts`](src/index.ts) | Executable user-operation examples |
+| [`tsconfig.json`](tsconfig.json) | TypeScript compiler configuration |
 
-## Insert Action
+## Learning boundaries
 
-The **insert action** involves adding new records to the database, such as creating a new user with details like `username`, `password`, and `name`, using Prisma's `create` method and providing feedback on successful creation.
+`Todo.userId` is a scalar field; the schema does not declare a Prisma relation. The password field is stored directly in this demonstration, so this is not an authentication implementation. The manifest declares a Jest test command but does not include Jest in its dependencies or a test suite.
 
-## Update Action
-
-The **update action** modifies existing records, such as changing a user's `name`, by identifying the user via a unique identifier like `username`, collecting new data, using Prisma's `update` method, and providing feedback on the successful update.
-
-## Remove Action
-
-The **remove action** deletes records from the database, such as removing a user, by identifying the user via a unique identifier like `username` or `id`, using Prisma's `delete` method, and providing feedback on successful deletion.
-
-## Create Action
-
-The **create action** encompasses inserting new records and possibly multiple related records, such as creating a user or to-do item with details like `username`, `password`, and `name` for users or `title`, `description`, and `userId` for to-do items, using Prisma's `create` method and providing feedback on successful creation.
-
-
-## Database URL
-If you are using NeonTech for your PostgreSQL database, follow these steps to get your database URL:
-
-- Log in to your NeonTech account.
-
-- Navigate to your project dashboard.
-
-- Locate your PostgreSQL instance and find the connection details.
-
-- Copy the provided database URL.
-
-- Create a .env file in the root directory of your project and add the following line:
+Package metadata declares the **ISC** license.
